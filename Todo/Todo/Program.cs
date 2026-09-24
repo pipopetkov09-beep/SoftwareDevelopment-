@@ -10,6 +10,8 @@ namespace Todo
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Presko");
+
         }
     }
 }
