@@ -10,7 +10,7 @@ namespace Todo
     {
         
         static List<TaskItem> tasks = new List<TaskItem>();
-
+        static int nextId = 1;
         static void Main()
         {
             bool running = true;
@@ -89,11 +89,15 @@ namespace Todo
                 Console.WriteLine("Невалидна дата! Опитайте отново.");
             }
 
-            TaskItem task = new TaskItem(title, description, deadline);
+            TaskItem task = new TaskItem(nextId ,title, description, deadline);
             tasks.Add(task);
 
             Console.WriteLine("\nЗадачата беше добавена успешно!");
             Pause();
+
+            tasks.Add(task);
+            nextId++;
+            Console.WriteLine("Задачата е добавена.");
         }
 
         static void ShowTasks()
@@ -157,6 +161,25 @@ namespace Todo
         {
             Console.Clear();
             Console.WriteLine("===== ИЗТРИВАНЕ НА ЗАДАЧА =====");
+
+            foreach(TaskItem task in tasks)
+            {
+                Console.WriteLine($"{task.Id}. {task.Title}");
+            }
+            Console.Write("Избери Id:");
+            int Id = int.Parse(Console.ReadLine());
+            TaskItem deleteTask = null;
+
+            foreach(TaskItem task in tasks)
+            {
+                if(task.Id == Id)
+                {
+                    deleteTask = task;
+                    break;
+                }
+            }
+
+            
 
             if (tasks.Count == 0)
             {
