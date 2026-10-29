@@ -9,8 +9,7 @@ namespace Todo
     internal class Program
     {
         
-        static List<TaskItem> tasks = new List<TaskItem>();
-        static int nextId = 1;
+        
         static void Main()
         {
             bool running = true;
@@ -89,15 +88,9 @@ namespace Todo
                 Console.WriteLine("Невалидна дата! Опитайте отново.");
             }
 
-            TaskItem task = new TaskItem(nextId ,title, description, deadline);
-            tasks.Add(task);
-
             Console.WriteLine("\nЗадачата беше добавена успешно!");
             Pause();
 
-            tasks.Add(task);
-            nextId++;
-            Console.WriteLine("Задачата е добавена.");
         }
 
         static void ShowTasks()
@@ -219,5 +212,8 @@ namespace Todo
             Console.WriteLine("\nНатиснете Enter за продължаване...");
             Console.ReadLine();
         }
+
+
+         
     }
 }
