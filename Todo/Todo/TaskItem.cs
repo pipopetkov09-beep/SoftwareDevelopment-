@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Todo
 {
-    internal class TaskItem
+    internal class TodoItem
     {
         private string title;
         private DateTime dueDate;
@@ -54,7 +54,7 @@ namespace Todo
             }
         }
 
-        public TaskItem(int id, string title, string description, DateTime dueDate)
+        public TodoItem(int id, string title, string description, DateTime dueDate)
         {
             if (id <= 0)
                 throw new ArgumentOutOfRangeException(nameof(id), "Id трябва да е положително число");

@@ -9,17 +9,21 @@ namespace Todo
 {
     internal class TodoService
     {
-        private readonly List<TaskItem> tasks = new List<TaskItem>();
-        private int nextId = 1;
+        private readonly TodoStorage storage;
 
-        public List<TaskItem> GetAll()
+        public TodoService(TodoStorage storage)
         {
-            return tasks;
+            this.storage = storage;
         }
 
-        public TaskItem FindById(int id)
+        public IReadOnlyList<TodoItem> GetAll()
         {
-            foreach(TaskItem taskItem in tasks)
+            return storage.Todos;
+        }
+
+        public TodoItem FindById(int id)
+        {
+            foreach(TodoItem taskItem in storage.Todos)
             {
                 return taskItem;
             }
@@ -29,23 +33,37 @@ namespace Todo
 
         public void Add(string title, string description, DateTime dueDate)
         {
-            TaskItem taskItem = new TaskItem(nextId, title, description, dueDate);
-            tasks.Add(taskItem);
-            nextId++;
+            TodoItem taskItem = new TodoItem(storage.NextId, title, description, dueDate);
+            storage.Todos.Add(taskItem);
+            storage.NextId++;
 
         }
 
         public void Completed(int id)
         {
-            TaskItem task = FindById(id);
-            if(task == null)
+            TodoItem todos = FindById(id);
+            if(todos == null)
             {
                 throw new ArgumentException("Няма въведени задачи.");
             }
 
-            task.Completed();
+            todos.Completed();
 
         }
+
+        public void Deleted(int id)
+        {
+            TodoItem task = FindById(id);
+            if (task == null)
+            {
+                throw new ArgumentException("Няма въведени задачи.");
+            }
+
+           storage.Todos.Remove(task);
+
+        }
+
+        
 
     }
 }

@@ -12,6 +12,9 @@ namespace Todo
         
         static void Main()
         {
+            TodoStorage storage = new TodoStorage();
+            TodoService service = new TodoService(storage);
+
             bool running = true;
 
             while (running)
@@ -28,39 +31,42 @@ namespace Todo
                 Console.Write("Изберете опция: ");
 
                 string choice = Console.ReadLine();
-
-                switch (choice)
+                try
                 {
-                    case "1":
-                        AddTask();
-                        break;
+                    switch (choice)
+                    {
+                        case "1":
+                            AddTodo(service);
+                            break;
 
-                    case "2":
-                        ShowTasks();
-                        break;
+                        case "2":
+                            ShowTodos(service);
+                            break;
 
-                    case "3":
-                        CompleteTask();
-                        break;
+                        case "3":
+                            CompleteTodo(service);
+                            break;
 
-                    case "4":
-                        DeleteTask();
-                        break;
+                        case "4":
+                            DeletedTodo(service);
+                            break;
 
-                    case "5":
-                        running = false;
-                        Console.WriteLine("Програмата приключи.");
-                        break;
+                        case "5":
+                            running = false;
+                            Console.WriteLine("Програмата приключи.");
+                            break;
 
-                    default:
-                        Console.WriteLine("Невалиден избор!");
-                        Pause();
-                        break;
+                        default:
+                            Console.WriteLine("Невалиден избор!");
+                            Pause();
+                            break;
+                    }
                 }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
         }
 
-        static void AddTask()
+        static void AddTodo(TodoService service)
         {
             Console.Clear();
             Console.WriteLine("===== ДОБАВЯНЕ НА ЗАДАЧА =====");
@@ -88,124 +94,80 @@ namespace Todo
                 Console.WriteLine("Невалидна дата! Опитайте отново.");
             }
 
+            service.Add(title, description, deadline);
+
             Console.WriteLine("\nЗадачата беше добавена успешно!");
             Pause();
 
         }
 
-        static void ShowTasks()
+        static void ShowTodos(TodoService service)
         {
             Console.Clear();
             Console.WriteLine("===== ВСИЧКИ ЗАДАЧИ =====");
 
-            if (tasks.Count == 0)
+            var todos = service.GetAll();
+
+            if (todos.Count == 0)
             {
                 Console.WriteLine("Няма въведени задачи.");
                 Pause();
                 return;
             }
 
-            for (int i = 0; i < tasks.Count; i++)
-            {
-                TaskItem task = tasks[i];
-
-                Console.WriteLine($"\nЗадача #{i + 1}");
-                Console.WriteLine($"Заглавие: {task.Title}");
-                Console.WriteLine($"Описание: {task.Description}");
-                Console.WriteLine($"Краен срок: {task.Deadline:dd.MM.yyyy}");
-                Console.WriteLine($"Статус: {(task.IsCompleted ? "Изпълнена" : "Неизпълнена")}");
-                Console.WriteLine("-----------------------------");
-            }
-
-            Pause();
-        }
-
-        static void CompleteTask()
-        {
-            Console.Clear();
-            Console.WriteLine("===== МАРКИРАНЕ НА ЗАДАЧА =====");
-
-            if (tasks.Count == 0)
-            {
-                Console.WriteLine("Няма въведени задачи.");
-                Pause();
-                return;
-            }
-
-            ShowTaskTitles();
-
-            Console.Write("Въведете номер на задачата: ");
-
-            if (int.TryParse(Console.ReadLine(), out int number) &&
-                number >= 1 && number <= tasks.Count)
-            {
-                tasks[number - 1].IsCompleted = true;
-                Console.WriteLine("Задачата беше маркирана като изпълнена.");
-            }
             else
             {
-                Console.WriteLine("Невалиден номер на задача.");
-            }
-
-            Pause();
-        }
-
-        static void DeleteTask()
-        {
-            Console.Clear();
-            Console.WriteLine("===== ИЗТРИВАНЕ НА ЗАДАЧА =====");
-
-            foreach(TaskItem task in tasks)
-            {
-                Console.WriteLine($"{task.Id}. {task.Title}");
-            }
-            Console.Write("Избери Id:");
-            int Id = int.Parse(Console.ReadLine());
-            TaskItem deleteTask = null;
-
-            foreach(TaskItem task in tasks)
-            {
-                if(task.Id == Id)
+                foreach(TodoItem todoItem in todos)
                 {
-                    deleteTask = task;
-                    break;
+                    Console.WriteLine($"{todoItem}");
                 }
             }
 
-            
-
-            if (tasks.Count == 0)
-            {
-                Console.WriteLine("Няма въведени задачи.");
                 Pause();
-                return;
-            }
-
-            ShowTaskTitles();
-
-            Console.Write("Въведете номер на задачата за изтриване: ");
-
-            if (int.TryParse(Console.ReadLine(), out int number) &&
-                number >= 1 && number <= tasks.Count)
-            {
-                tasks.RemoveAt(number - 1);
-                Console.WriteLine("Задачата беше изтрита.");
-            }
-            else
-            {
-                Console.WriteLine("Невалиден номер на задача.");
-            }
-
-            Pause();
         }
 
-        static void ShowTaskTitles()
+        private static void CompleteTodo(TodoService service)
         {
-            for (int i = 0; i < tasks.Count; i++)
+            Console.Clear();
+            Console.WriteLine();
+            Console.WriteLine("=====  Маркирай задача като завършена =======\n");
+            ShowTodos(service);
+
+            Console.Write("Избери Id: ");
+            int id;
+            while (!int.TryParse(Console.ReadLine(), out id))
             {
-                Console.WriteLine($"{i + 1}. {tasks[i].Title}");
+                Console.WriteLine("Невалидно id.");
+                Console.Write("Избери Id: ");
             }
+
+            service.Completed(id);
+
+            Console.WriteLine("Задачата е завършена.");
+
         }
+
+        private static void DeletedTodo(TodoService service)
+        {
+            Console.Clear();
+            Console.WriteLine();
+            Console.WriteLine("=====  Изтрий задача =======\n");
+            ShowTodos(service);
+
+            Console.Write("Избери Id: ");
+            int id;
+            while (!int.TryParse(Console.ReadLine(), out id))
+            {
+                Console.WriteLine("Невалидно id.");
+                Console.Write("Избери Id: ");
+            }
+
+            service.Deleted(id);
+
+            Console.WriteLine("Задачата е изтрита.");
+
+        }
+
 
         static void Pause()
         {
