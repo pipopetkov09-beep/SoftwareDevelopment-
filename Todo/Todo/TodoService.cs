@@ -10,10 +10,12 @@ namespace Todo
     internal class TodoService
     {
         private readonly TodoStorage storage;
+        private readonly FileStorage fileStorage;
 
-        public TodoService(TodoStorage storage)
+        public TodoService(FileStorage file)
         {
-            this.storage = storage;
+            this.storage = fileStorage.Load();
+            fileStorage = file;
         }
 
         public IReadOnlyList<TodoItem> GetAll()
@@ -37,6 +39,7 @@ namespace Todo
             storage.Todos.Add(taskItem);
             storage.NextId++;
 
+            fileStorage.Save(storage);
         }
 
         public void Completed(int id)
@@ -48,7 +51,7 @@ namespace Todo
             }
 
             todos.Completed();
-
+            fileStorage.Save(storage);
         }
 
         public void Deleted(int id)
@@ -60,7 +63,7 @@ namespace Todo
             }
 
            storage.Todos.Remove(task);
-
+           fileStorage.Save(storage);
         }
 
         

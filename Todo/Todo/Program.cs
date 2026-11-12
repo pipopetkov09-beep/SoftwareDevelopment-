@@ -12,8 +12,9 @@ namespace Todo
         
         static void Main()
         {
-            TodoStorage storage = new TodoStorage();
-            TodoService service = new TodoService(storage);
+            //TodoStorage storage = new TodoStorage();
+            FileStorage fileStorage = new FileStorage("todos.json");
+            TodoService service = new TodoService(fileStorage);
 
             bool running = true;
 
